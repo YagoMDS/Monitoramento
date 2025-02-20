@@ -1,0 +1,44 @@
+2️⃣ Web Scraper para Monitoramento de Preços (🛒)
+🔹 O que faz? Um script que coleta preços de produtos em sites como Amazon, Mercado Livre ou Shopee e alerta quando um preço cai.
+🔹 Tecnologias: Python, BeautifulSoup, Selenium, Pandas.
+🔹 Destaques no LinkedIn:
+✅ Automatização e web scraping.
+✅ Pode rodar no GitHub Actions para atualizações periódicas.
+✅ Envio de alertas por e-mail/WhatsApp.
+
+
+
+1️⃣ Definir o Escopo do Projeto
+- Quais produtos ou serviços você deseja monitorar?
+    Vamos monitar luvas de boxe
+- Em quais sites você vai coletar os preços? (Ex: Amazon, Mercado Livre, Shopee)
+    Amazon, MercadoLivre e Maximum
+- Com que frequência os preços serão monitorados? (Diário, semanal, etc.)
+    Monitoramento Diário
+
+2️⃣ Verificar as Políticas dos Sites
+- Muitos sites possuem regras no robots.txt que definem o que pode ser raspado.
+- Sites maiores podem bloquear requisições automáticas; considere usar headers e proxies.
+
+3️⃣ Escolher as Ferramentas
+- Requests → Para fazer requisições HTTP e buscar as páginas.
+- BeautifulSoup → Para extrair informações do HTML de forma estruturada.
+- Selenium → Se precisar interagir com páginas dinâmicas (JavaScript).
+- Pandas → Para armazenar e manipular os dados coletados.
+- SQLite/PostgreSQL → Se quiser salvar os dados em um banco de dados.
+
+4️⃣ Testar a Coleta de Dados
+- Escolha um site e faça um teste simples para coletar o nome e o preço de um produto.
+- Analise a estrutura HTML e identifique os seletores corretos (usando inspecionar elemento no navegador).
+
+5️⃣ Criar a Automação
+- Faça um script que percorra a página e extraia os dados automaticamente.
+- Armazene os dados em um CSV ou banco de dados para comparação futura.
+
+6️⃣ Implementar Alertas e Visualização
+- Criar um sistema de notificação (Ex: e-mail, Telegram) quando um preço baixar.
+- Gerar gráficos para visualizar a variação de preços.
+
+7️⃣ Publicar e Compartilhar no LinkedIn
+- Documente o processo com prints e um repositório no GitHub.
+- Explique os desafios e soluções encontradas no LinkedIn para atrair recrutadores.
