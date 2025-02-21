@@ -12,9 +12,15 @@ def ConsultarPreco():
     headers = {
     'Authorization': f'Bearer {os.getenv('ML_ACCESS_TOKEN')}'}
 
-    response = requests.request("GET", url, headers=headers)
-
-    return response.json()
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    
+    except requests.exceptions.RequestException as e:
+        print("Erro ao buscar o produto")
+        return None
+    
 
 def GerarToken():
 
@@ -39,12 +45,11 @@ def GerarToken():
         return response.json()  # Retorna como JSON (dicionário Python)
     
     except requests.exceptions.RequestException as e:
-        print(f"Erro na requisição: {e}")
+        print(f"Erro na requisição:")
         return None
 
 def main():
     response_token = GerarToken()
-    response_item = ConsultarPreco()
 
     if response_token and "refresh_token" in response_token:
         token = response_token["refresh_token"]  # Pega o token diretamente do JSON
@@ -62,20 +67,24 @@ def main():
 
     print()
 
-    standard = []
-    for price in response_item["prices"]:
-        if price["type"] == "standard": 
-            standard.append(price["amount"])
-            standard = str(standard[0])
-
-    promotion = []
-    for price in response_item["prices"]:
-        if price["type"] == "promotion":
-            promotion.append(price["amount"])
-            promotion = str(promotion[0])
-
-    print(promotion) # preço promocional
-    print(standard) # valor indicado pelo vendedor sem promoções
+    response_item = ConsultarPreco()
     
+    if response_item is None:
+        return
+    else:
+        standard = []
+        for price in response_item["prices"]:
+            if price["type"] == "standard": 
+                standard.append(price["amount"])
+                standard = str(standard[0])
 
+        promotion = []
+        for price in response_item["prices"]:
+            if price["type"] == "promotion":
+                promotion.append(price["amount"])
+                promotion = str(promotion[0])
+
+        print(promotion) # preço promocional
+        print(standard) # valor indicado pelo vendedor sem promoções
+    
 main()
