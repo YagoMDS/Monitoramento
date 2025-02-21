@@ -1,13 +1,24 @@
 import requests
 import os
+import json
 from dotenv import load_dotenv 
 
 # Carregar o arquivo .env
 load_dotenv("infos.env")
 
+def ConsultarPreco():
+
+    url = "https://api.mercadolibre.com/items/MLB3930037419/prices"
+    headers = {
+    'Authorization': f'Bearer {os.getenv('ML_ACCESS_TOKEN')}'}
+
+    response = requests.request("GET", url, headers=headers)
+
+    return response.json()
+
 def GerarToken():
 
-    url = "https://api.mercadolibre.com/oauth/token"
+    url_token = "https://api.mercadolibre.com/oauth/token"
 
     payload = {
         "grant_type": "refresh_token",
@@ -21,7 +32,7 @@ def GerarToken():
     }
 
     try:
-        response = requests.post(url, headers=headers, data=payload)
+        response = requests.post(url_token, headers=headers, data=payload)
         response.raise_for_status()  # Garante que não houve erro na requisição
         os.system('cls')
 
@@ -32,12 +43,39 @@ def GerarToken():
         return None
 
 def main():
-    response = GerarToken()
+    response_token = GerarToken()
+    response_item = ConsultarPreco()
 
-    if response and "refresh_token" in response:
-        token = response["refresh_token"]  # Pega o token diretamente do JSON
+    if response_token and "refresh_token" in response_token:
+        token = response_token["refresh_token"]  # Pega o token diretamente do JSON
         print(f"Token gerado: {token}")
     else:
         print("Erro ao gerar o token.")
+    
+    print()
+
+    if response_token and "access_token" in response_token:
+        access_token = response_token["access_token"]  # Pega o access_token diretamente do JSON
+        print(f"Access_token: {access_token}")
+    else:
+        print("Erro ao gerar Access.")
+
+    print()
+
+    standard = []
+    for price in response_item["prices"]:
+        if price["type"] == "standard": 
+            standard.append(price["amount"])
+            standard = str(standard[0])
+
+    promotion = []
+    for price in response_item["prices"]:
+        if price["type"] == "promotion":
+            promotion.append(price["amount"])
+            promotion = str(promotion[0])
+
+    print(promotion) # preço promocional
+    print(standard) # valor indicado pelo vendedor sem promoções
+    
 
 main()
