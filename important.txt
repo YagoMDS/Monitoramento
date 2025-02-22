@@ -15,3 +15,27 @@ curl -X GET -H 'Authorization: Bearer $ACCESS_TOKEN' https://api.mercadolibre.co
     "user_id": 391581891,
     "refresh_token": "TG-67b767e7038f9e0001ae9c83-391581891"
                         TG-67b768d843b58e000138c105-391581891
+
+
+
+
+Items Prices: receberá notificações do item_id cada vez que o preço for criado, atualizado ou excluído.
+
+Resposta de notificação:
+
+{
+   "_id":"f9f08571-1f65-4c46-9e0a-c0f43faas1557e",
+   "resource": "/items/MLA686791111",
+   "user_id": 123456789,
+   "topic": "items",
+   "application_id": 2069392825111111,
+   "attempts": 1,
+   "sent": "2023-02-06T13:44:33.006Z",
+   "received": "2023-02-06T13:44:32.984Z"
+}
+
+
+Obter preços do produto:
+
+curl -X GET -H 'Authorization: Bearer APP_USR-3360521794976032-022114-94cb7a1cdee1d81e9fc49b7b5972181d-391581891' https://api.mercadolibre.com/items/MLB3930037419/prices
+
