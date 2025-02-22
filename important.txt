@@ -36,7 +36,8 @@ Resposta de notificação:
 
 
 Obter preços do produto:
-
-curl -X GET -H 'Authorization: Bearer APP_USR-3360521794976032-022114-94cb7a1cdee1d81e9fc49b7b5972181d-391581891' https://api.mercadolibre.com/items/MLB3930037419/prices
-
+curl -X GET -H 'Authorization: Bearer APP_USR-3360521794976032-022121-70281494526c4efbede2c20dd81d5a16-391581891' https://api.mercadolibre.com/items/MLB3930037419/prices
 MLB3930037419
+
+Detalhes do produto:
+curl -X GET -H 'Authorization: Bearer APP_USR-3360521794976032-022208-0ae9bbf3a84d7e7f0fdb6947829b64d2-391581891' https://api.mercadolibre.com/items/MLB3930037419
