@@ -1,16 +1,15 @@
 import requests
 import os
-import json
+import psycopg2
 from dotenv import load_dotenv 
 
 # Carregar o arquivo .env
 load_dotenv("infos.env")
 
-def ConsultarPreco():
-
-    url = "https://api.mercadolibre.com/items/MLB3930037419/prices"
-    headers = {
-    'Authorization': f'Bearer {os.getenv('ML_ACCESS_TOKEN')}'}
+def ConsultaItemDetalhes(item_id):
+    url = f"https://api.mercadolibre.com/items/{item_id}"
+    token = os.getenv('ML_ACCESS_TOKEN')
+    headers = {'Authorization': f"{token}"}
 
     try:
         response = requests.get(url, headers=headers)
@@ -18,7 +17,23 @@ def ConsultarPreco():
         return response.json()
     
     except requests.exceptions.RequestException as e:
-        print("Erro ao buscar o produto")
+        print(f"Erro ao buscar o produto: {e}")
+        return None
+    
+
+def ConsultarPrecoPromoc(item_id):
+
+    url = f"https://api.mercadolibre.com/items/{item_id}/prices"
+    token = os.getenv('ML_ACCESS_TOKEN')
+    headers = {'Authorization': f"Bearer {token}"}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar o produto: {e}")
         return None
     
 
@@ -48,7 +63,9 @@ def GerarToken():
         print(f"Erro na requisição:")
         return None
 
+
 def main():
+
     response_token = GerarToken()
 
     if response_token and "refresh_token" in response_token:
@@ -67,19 +84,21 @@ def main():
 
     print()
 
-    response_item = ConsultarPreco()
+
+    produto = "MLB3930037419"
+    promocional = ConsultarPrecoPromoc(produto)
     
-    if response_item is None:
+    if promocional is None:
         return
     else:
         standard = []
-        for price in response_item["prices"]:
+        for price in promocional["prices"]:
             if price["type"] == "standard": 
                 standard.append(price["amount"])
                 standard = str(standard[0])
 
         promotion = []
-        for price in response_item["prices"]:
+        for price in promocional["prices"]:
             if price["type"] == "promotion":
                 promotion.append(price["amount"])
                 promotion = str(promotion[0])
@@ -87,4 +106,17 @@ def main():
         print(promotion) # preço promocional
         print(standard) # valor indicado pelo vendedor sem promoções
     
+    detalhes_produto = ConsultaItemDetalhes(produto)
+
+    if detalhes_produto is None:
+        return 
+    else:
+        title = detalhes_produto["title"]
+        last_updated = detalhes_produto["last_updated"]
+        last_updated = last_updated[0:10]
+        
+
+    print(title)
+    print(last_updated)
+
 main()
