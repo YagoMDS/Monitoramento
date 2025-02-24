@@ -6,8 +6,24 @@ from dotenv import load_dotenv
 # Carregar o arquivo .env
 load_dotenv("infos.env")
 
-def ConsultaItemDetalhes(item_id):
-    url = f"https://api.mercadolibre.com/items/{item_id}"
+def conectar_db():
+    os.system('cls')
+    try:
+        conn = psycopg2.connect(
+            dbname=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
+        )
+        return conn
+    except Exception as e:
+        print(f"Erro na conexão com o banco de dados: {e}")
+        return None
+    
+# Realiza uma consulta dos detalhes do produto
+def ConsultaItemDetalhes(produto_id):
+    url = f"https://api.mercadolibre.com/items/{produto_id}"
     token = os.getenv('ML_ACCESS_TOKEN')
     headers = {'Authorization': f"{token}"}
 
@@ -20,10 +36,10 @@ def ConsultaItemDetalhes(item_id):
         print(f"Erro ao buscar o produto: {e}")
         return None
     
+# Realiza uma consulta dos preços do produto
+def ConsultarPrecoPromoc(produto_id):
 
-def ConsultarPrecoPromoc(item_id):
-
-    url = f"https://api.mercadolibre.com/items/{item_id}/prices"
+    url = f"https://api.mercadolibre.com/items/{produto_id}/prices"
     token = os.getenv('ML_ACCESS_TOKEN')
     headers = {'Authorization': f"Bearer {token}"}
 
@@ -55,7 +71,6 @@ def GerarToken():
     try:
         response = requests.post(url_token, headers=headers, data=payload)
         response.raise_for_status()  # Garante que não houve erro na requisição
-        os.system('cls')
 
         return response.json()  # Retorna como JSON (dicionário Python)
     
@@ -65,7 +80,7 @@ def GerarToken():
 
 
 def main():
-
+    conectar_db()
     response_token = GerarToken()
 
     if response_token and "refresh_token" in response_token:

@@ -41,3 +41,5 @@ MLB3930037419
 
 Detalhes do produto:
 curl -X GET -H 'Authorization: Bearer APP_USR-3360521794976032-022208-0ae9bbf3a84d7e7f0fdb6947829b64d2-391581891' https://api.mercadolibre.com/items/MLB3930037419
+
+
