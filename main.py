@@ -1,4 +1,5 @@
 import requests
+import time
 import os
 import psycopg2
 from dotenv import load_dotenv 
@@ -52,7 +53,7 @@ def GerarToken():
 def ConsultaItemDetalhes(produto_id):
     url = f"https://api.mercadolibre.com/items/{produto_id}"
     token = os.getenv('ML_ACCESS_TOKEN')
-    headers = {'Authorization': f"{token}"}
+    headers = {'Authorization': f"Bearer {token}"}
 
     try:
         response = requests.get(url, headers=headers)
@@ -89,21 +90,25 @@ def ConsultarPrecoPromoc(produto_id):
 # Insere dados na tabela 
 def insert(*args):
 
+    conexao = conectar_db()
+    if not conexao:
+        return
+
     try:
-        conexao = conectar_db()
         cur = conexao.cursor()
 
-        query = "INSERT INTO consulta(name, p_promocional, p_standard, last_update) VALUES (%s, %s, %s, %s)" 
+        query = "INSERT INTO precos(id_produto, price_default, price_promotion, last_updated) VALUES (%s, %s, %s, %s)" 
         cur.execute(query, args)
 
         conexao.commit()  # Confirma a transação
         cur.close()
         conexao.close()
 
-        return "Inserção realizada com sucesso!"
+        return print("Inserção realizada com sucesso!")
     
     except psycopg2.Error as e:
-        return f"Erro ao inserir dados: {e}"
+        print(f"Erro ao inserir dados: {e}")
+        return None
 
     
 
@@ -128,28 +133,32 @@ def main():
 
 
     produto = "MLB3930037419"
+    intervalo = 3600
     promocional = ConsultarPrecoPromoc(produto)
     
-    if promocional is None:
-        return
-    else:
-        standard = []
-        for price in promocional["prices"]:
-            if price["type"] == "standard": 
-                standard.append(price["amount"])
-                standard = str(standard[0])
+    while True:
+        if promocional is None:
+            return
+        else:
+            standard = []
+            for price in promocional["prices"]:
+                if price["type"] == "standard": 
+                    standard.append(price["amount"])
+                    standard = str(standard[0])
 
-        promotion = []
-        for price in promocional["prices"]:
-            if price["type"] == "promotion":
-                promotion.append(price["amount"])
-                promotion = str(promotion[0])
-    
-    detalhes_produto = ConsultaItemDetalhes(produto)
-    nome_produto = detalhes_produto[0]
-    last_update = detalhes_produto[1]
-    
+            promotion = []
+            for price in promocional["prices"]:
+                if price["type"] == "promotion":
+                    promotion.append(price["amount"])
+                    promotion = str(promotion[0])
 
-    insert(promotion, standard, nome_produto, last_update)
+        detalhes_produto = ConsultaItemDetalhes(produto)
+        nome_produto = detalhes_produto[0] # Várialvel que pega o nome do produto
+        last_update = detalhes_produto[1] # Várialvel que pega a última atualização do produto
+
+        insert(1,standard, promotion, last_update)
+        print(f"Aguardando {intervalo} segundos para a próxima coleta...")
+
+        time.sleep(intervalo)
 
 main()
