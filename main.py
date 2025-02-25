@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv("infos.env")
 
 def conectar_db():
-    os.system('cls')
+
     try:
         conn = psycopg2.connect(
             dbname=os.getenv("DB_NAME"),
@@ -20,41 +20,10 @@ def conectar_db():
     except Exception as e:
         print(f"Erro na conexão com o banco de dados: {e}")
         return None
-    
-# Realiza uma consulta dos detalhes do produto
-def ConsultaItemDetalhes(produto_id):
-    url = f"https://api.mercadolibre.com/items/{produto_id}"
-    token = os.getenv('ML_ACCESS_TOKEN')
-    headers = {'Authorization': f"{token}"}
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json()
-    
-    except requests.exceptions.RequestException as e:
-        print(f"Erro ao buscar o produto: {e}")
-        return None
-    
-# Realiza uma consulta dos preços do produto
-def ConsultarPrecoPromoc(produto_id):
-
-    url = f"https://api.mercadolibre.com/items/{produto_id}/prices"
-    token = os.getenv('ML_ACCESS_TOKEN')
-    headers = {'Authorization': f"Bearer {token}"}
-
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json()
-    
-    except requests.exceptions.RequestException as e:
-        print(f"Erro ao buscar o produto: {e}")
-        return None
-    
-
+# Gera um novo Token para consulta na API
 def GerarToken():
-
+    os.system('cls')
     url_token = "https://api.mercadolibre.com/oauth/token"
 
     payload = {
@@ -78,9 +47,67 @@ def GerarToken():
         print(f"Erro na requisição:")
         return None
 
+    
+# Realiza uma consulta dos detalhes do produto
+def ConsultaItemDetalhes(produto_id):
+    url = f"https://api.mercadolibre.com/items/{produto_id}"
+    token = os.getenv('ML_ACCESS_TOKEN')
+    headers = {'Authorization': f"{token}"}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        detalhes_produto = response.json()
+        if detalhes_produto is None:
+            return 
+        else:
+            title = detalhes_produto["title"]
+            last_updated = detalhes_produto["last_updated"]
+            last_updated = last_updated[0:10]
+        return title, last_updated
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar o produto: {e}")
+        return None
+    
+# Realiza uma consulta dos preços do produto
+def ConsultarPrecoPromoc(produto_id):
+
+    url = f"https://api.mercadolibre.com/items/{produto_id}/prices"
+    token = os.getenv('ML_ACCESS_TOKEN')
+    headers = {'Authorization': f"Bearer {token}"}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar o produto: {e}")
+        return None
+    
+# Insere dados na tabela 
+def insert(*args):
+
+    try:
+        conexao = conectar_db()
+        cur = conexao.cursor()
+
+        query = "INSERT INTO consulta(name, p_promocional, p_standard, last_update) VALUES (%s, %s, %s, %s)" 
+        cur.execute(query, args)
+
+        conexao.commit()  # Confirma a transação
+        cur.close()
+        conexao.close()
+
+        return "Inserção realizada com sucesso!"
+    
+    except psycopg2.Error as e:
+        return f"Erro ao inserir dados: {e}"
+
+    
 
 def main():
-    conectar_db()
     response_token = GerarToken()
 
     if response_token and "refresh_token" in response_token:
@@ -117,21 +144,12 @@ def main():
             if price["type"] == "promotion":
                 promotion.append(price["amount"])
                 promotion = str(promotion[0])
-
-        print(promotion) # preço promocional
-        print(standard) # valor indicado pelo vendedor sem promoções
     
     detalhes_produto = ConsultaItemDetalhes(produto)
+    nome_produto = detalhes_produto[0]
+    last_update = detalhes_produto[1]
+    
 
-    if detalhes_produto is None:
-        return 
-    else:
-        title = detalhes_produto["title"]
-        last_updated = detalhes_produto["last_updated"]
-        last_updated = last_updated[0:10]
-        
-
-    print(title)
-    print(last_updated)
+    insert(promotion, standard, nome_produto, last_update)
 
 main()
