@@ -7,6 +7,7 @@ Ele pode ser útil para:
 - Comparação de preços entre diferentes produtos
 - Análise de tendências de mercado
 
+
 ## 🛠️ Pré-requisitos
 
 Antes de rodar o projeto, você precisará ter instalado:
@@ -14,6 +15,7 @@ Antes de rodar o projeto, você precisará ter instalado:
 - **Python 3.8+**
 - **PostgreSQL**
 - **Virtualenv** (opcional, mas recomendado)
+
 
 ## 📥 Instalação
 
@@ -29,6 +31,7 @@ Antes de rodar o projeto, você precisará ter instalado:
 
 3. Instale as dependências:
     pip install -r requirements.txt
+
 
 
 🗄️ Configuração do Banco de Dados
@@ -70,3 +73,39 @@ Antes de rodar o projeto, você precisará ter instalado:
     ML_CLIENT_SECRET=seu_client_secret
     ML_REFRESH_TOKEN=seu_refresh_token
     ML_ACCESS_TOKEN=seu_access_token
+
+
+
+🚀 Execução
+
+Para iniciar a coleta de dados, basta rodar o seguinte comando:
+
+    python main.py
+
+O script será executado em intervalos de 1 hora por padrão. Ele buscará os preços na API do Mercado Livre e salvará os dados no banco de dados.
+
+⚙️ Como Funciona?
+
+1. Autenticação na API: O programa gera um novo Access Token usando o Refresh Token.
+2. Consulta de Preços: O scraper faz um GET na API do Mercado Livre para buscar os preços de um produto específico.
+3. Armazenamento no Banco de Dados: Os dados coletados são armazenados no PostgreSQL.
+4. Execução Periódica: O código roda em um loop com intervalo de tempo configurado.
+
+OBS: Pode ser configurado para rodar automáticamente via Agendador de Tarefas(Task Scheduler)
+
+
+
+📌 Exemplo de Uso
+
+Suponha que você esteja monitorando o produto MLB3930037419. O programa coletará informações como:
+
+ID Produto	    Preço Padrão	Preço Promocional	    Última Atualização
+MLB3930037419	R$ 150,00	    R$ 129,90	            2024-02-20
+
+🛠️ Tecnologias Utilizadas
+    Python
+    Requests (para chamadas HTTP)
+    PostgreSQL
+    psycopg2 (para interação com o banco)
+    dotenv (para configuração de variáveis de ambiente)
+    OS e Time (para automação e agendamento)
