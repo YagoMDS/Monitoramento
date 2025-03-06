@@ -99,7 +99,7 @@ OBS: Pode ser configurado para rodar automáticamente via Agendador de Tarefas(T
 
 Suponha que você esteja monitorando o produto MLB3930037419. O programa coletará informações como:
 
-ID Produto	    Preço Padrão	Preço Promocional	    Última Atualização
+Codigo ML	    Preço Padrão	Preço Promocional	    Última Atualização
 MLB3930037419	R$ 150,00	    R$ 129,90	            2024-02-20
 
 🛠️ Tecnologias Utilizadas

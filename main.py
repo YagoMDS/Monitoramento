@@ -136,29 +136,24 @@ def main():
     intervalo = 3600
     promocional = ConsultarPrecoPromoc(produto)
     
-    while True:
-        if promocional is None:
-            return
-        else:
-            standard = []
-            for price in promocional["prices"]:
-                if price["type"] == "standard": 
-                    standard.append(price["amount"])
-                    standard = str(standard[0])
+    if promocional is None:
+        return
+    else:
+        standard = []
+        for price in promocional["prices"]:
+            if price["type"] == "standard": 
+                standard.append(price["amount"])
+                standard = str(standard[0])
+        promotion = []
+        for price in promocional["prices"]:
+            if price["type"] == "promotion":
+                promotion.append(price["amount"])
+                promotion = str(promotion[0])
 
-            promotion = []
-            for price in promocional["prices"]:
-                if price["type"] == "promotion":
-                    promotion.append(price["amount"])
-                    promotion = str(promotion[0])
-
-        detalhes_produto = ConsultaItemDetalhes(produto)
-        nome_produto = detalhes_produto[0] # Várialvel que pega o nome do produto
-        last_update = detalhes_produto[1] # Várialvel que pega a última atualização do produto
-
-        insert(1,standard, promotion, last_update)
-        print(f"Aguardando {intervalo} segundos para a próxima coleta...")
-
-        time.sleep(intervalo)
+    detalhes_produto = ConsultaItemDetalhes(produto)
+    """nome_produto = detalhes_produto[0] # Várialvel que pega o nome do produto"""
+    last_update = detalhes_produto[1] # Várialvel que pega a última atualização do produto
+    
+    insert(1,standard, promotion, last_update)
 
 main()
