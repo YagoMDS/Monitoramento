@@ -7,20 +7,20 @@ from dotenv import load_dotenv
 # Carregar o arquivo .env
 load_dotenv("infos.env")
 
-def conectar_db():
+# def conectar_db():
 
-    try:
-        conn = psycopg2.connect(
-            dbname=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            host=os.getenv("DB_HOST"),
-            port=os.getenv("DB_PORT"),
-        )
-        return conn
-    except Exception as e:
-        print(f"Erro na conexão com o banco de dados: {e}")
-        return None
+#     try:
+#         conn = psycopg2.connect(
+#             dbname=os.getenv("DB_NAME"),
+#             user=os.getenv("DB_USER"),
+#             password=os.getenv("DB_PASSWORD"),
+#             host=os.getenv("DB_HOST"),
+#             port=os.getenv("DB_PORT"),
+#         )
+#         return conn
+#     except Exception as e:
+#         print(f"Erro na conexão com o banco de dados: {e}")
+#         return None
 
 # Gera um novo Token para consulta na API
 def GerarToken():
@@ -50,9 +50,9 @@ def GerarToken():
 
     
 # Realiza uma consulta dos detalhes do produto
-def ConsultaItemDetalhes(produto_id):
+def ConsultaItemDetalhes(produto_id, access_token):
     url = f"https://api.mercadolibre.com/items/{produto_id}"
-    token = os.getenv('ML_ACCESS_TOKEN')
+    token = access_token
     headers = {'Authorization': f"Bearer {token}"}
 
     try:
@@ -72,10 +72,10 @@ def ConsultaItemDetalhes(produto_id):
         return None
     
 # Realiza uma consulta dos preços do produto
-def ConsultarPrecoPromoc(produto_id):
+def ConsultarPrecoPromoc(produto_id, access_token):
 
     url = f"https://api.mercadolibre.com/items/{produto_id}/prices"
-    token = os.getenv('ML_ACCESS_TOKEN')
+    token = access_token
     headers = {'Authorization': f"Bearer {token}"}
 
     try:
@@ -88,28 +88,27 @@ def ConsultarPrecoPromoc(produto_id):
         return None
     
 # Insere dados na tabela 
-def insert(*args):
+# def insert(*args):
 
-    conexao = conectar_db()
-    if not conexao:
-        return
+#     conexao = conectar_db()
+#     if not conexao:
+#         return
 
-    try:
-        cur = conexao.cursor()
+#     try:
+#         cur = conexao.cursor()
 
-        query = "INSERT INTO precos(id_produto, price_default, price_promotion, last_updated) VALUES (%s, %s, %s, %s)" 
-        cur.execute(query, args)
+#         query = "INSERT INTO precos(id_produto, price_default, price_promotion, last_updated) VALUES (%s, %s, %s, %s)" 
+#         cur.execute(query, args)
 
-        conexao.commit()  # Confirma a transação
-        cur.close()
-        conexao.close()
+#         conexao.commit()  # Confirma a transação
+#         cur.close()
+#         conexao.close()
 
-        return print("Inserção realizada com sucesso!")
+#         return print("Inserção realizada com sucesso!")
     
-    except psycopg2.Error as e:
-        print(f"Erro ao inserir dados: {e}")
-        return None
-
+#     except psycopg2.Error as e:
+#         print(f"Erro ao inserir dados: {e}")
+#         return None
     
 
 def main():
@@ -132,28 +131,36 @@ def main():
     print()
 
 
-    produto = "MLB3930037419"
-    intervalo = 3600
-    promocional = ConsultarPrecoPromoc(produto)
+    produto = "MLB3986439067"
+    intervalo = 60
+    promocional = ConsultarPrecoPromoc(produto, access_token)
     
-    if promocional is None:
-        return
-    else:
-        standard = []
-        for price in promocional["prices"]:
-            if price["type"] == "standard": 
-                standard.append(price["amount"])
-                standard = str(standard[0])
-        promotion = []
-        for price in promocional["prices"]:
-            if price["type"] == "promotion":
-                promotion.append(price["amount"])
-                promotion = str(promotion[0])
+    while True:
+        if promocional is None:
+            return
+        else:
+            standard = []
+            for price in promocional["prices"]:
+                if price["type"] == "standard": 
+                    standard.append(price["amount"])
+                    standard = str(standard[0])
 
-    detalhes_produto = ConsultaItemDetalhes(produto)
-    """nome_produto = detalhes_produto[0] # Várialvel que pega o nome do produto"""
-    last_update = detalhes_produto[1] # Várialvel que pega a última atualização do produto
-    
-    insert(1,standard, promotion, last_update)
+            promotion = []
+            for price in promocional["prices"]:
+                if price["type"] == "promotion":
+                    promotion.append(price["amount"])
+                    promotion = str(promotion[0])
+
+        detalhes_produto = ConsultaItemDetalhes(produto, access_token)
+        nome_produto = detalhes_produto[0] # Várialvel que pega o nome do produto
+        last_update = detalhes_produto[1] # Várialvel que pega a última atualização do produto
+
+        print(f"{standard} / {promotion} / {nome_produto}")
+        print(last_update)
+
+        #insert(1,standard, promotion, last_update)
+        print(f"Aguardando {intervalo} segundos para a próxima coleta...")
+        
+        time.sleep(intervalo)
 
 main()
