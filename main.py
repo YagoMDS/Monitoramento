@@ -1,8 +1,7 @@
 import requests
 import time
 import os
-import psycopg2
-from database import conectar_db
+from database import insert
 from dotenv import load_dotenv 
 
 # Carregar o arquivo .env
@@ -73,29 +72,6 @@ def ConsultarPrecoPromoc(produto_id, access_token):
         print(f"Erro ao buscar o produto: {e}")
         return None
     
-# Insere dados na tabela 
-def insert(*args):
-
-    conexao = conectar_db()
-    if not conexao:
-        return
-
-    try:
-        cur = conexao.cursor()
-
-        query = "INSERT INTO precos(id_produto, price_default, price_promotion, last_updated) VALUES (%s, %s, %s, %s)" 
-        cur.execute(query, args)
-
-        conexao.commit()  # Confirma a transação
-        cur.close()
-        conexao.close()
-
-        return print("Inserção realizada com sucesso!")
-    
-    except psycopg2.Error as e:
-        print(f"Erro ao inserir dados: {e}")
-        return None
-    
 
 def main():
     response_token = GerarToken()
@@ -144,7 +120,7 @@ def main():
         print(f"{standard} / {promotion} / {nome_produto}")
         print(last_update)
 
-        #insert(1,standard, promotion, last_update)
+        insert(1,standard, promotion, last_update)
         print(f"Aguardando {intervalo} segundos para a próxima coleta...")
         
         time.sleep(intervalo)
