@@ -42,3 +42,14 @@
 7️⃣ Publicar e Compartilhar no LinkedIn
 - Documente o processo com prints e um repositório no GitHub.
 - Explique os desafios e soluções encontradas no LinkedIn para atrair recrutadores.
+
+
+SELECT 
+    prd.id as ID,
+    prd.codproduto as CODML,
+    prd.name as Nome,
+    prec.price_default as PrecoPadrao,
+    prec.price_promotion as PrecoPromocional,
+    prec.last_updated as UltimaAtualizacao
+FROM precos prec
+INNER JOIN produtos prd ON id = id_produto 

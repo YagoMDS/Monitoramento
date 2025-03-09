@@ -1,7 +1,7 @@
 import requests
 import time
 import os
-from database import insert
+from db_funcoes import insertpreco, consultaProdutos, insertproduto
 from dotenv import load_dotenv 
 
 # Carregar o arquivo .env
@@ -72,6 +72,18 @@ def ConsultarPrecoPromoc(produto_id, access_token):
         print(f"Erro ao buscar o produto: {e}")
         return None
     
+# Verifica se o código do produto existe na tabela PRODUTOS 
+def verificaCodigo(codprod, nome):
+
+    produto = consultaProdutos()
+    
+    if not produto:  # Se não encontrar o produto
+        # Insere o produto na tabela Produtos e retorna o id
+        id_produto = insertproduto(codprod, nome)
+        return id_produto
+    else:
+        print("Produto já existe na tabela")
+        return produto[0]  # Retorna o id do produto encontrado
 
 def main():
     response_token = GerarToken()
@@ -90,39 +102,50 @@ def main():
     else:
         print("Erro ao gerar Access.")
 
-    print()
 
 
-    produto = "MLB3986439067"
-    intervalo = 60
-    promocional = ConsultarPrecoPromoc(produto, access_token)
-    
-    while True:
-        if promocional is None:
-            return
-        else:
-            standard = []
-            for price in promocional["prices"]:
-                if price["type"] == "standard": 
-                    standard.append(price["amount"])
-                    standard = str(standard[0])
+    # Consulta todos os produtos da tabela
+    produtos = consultaProdutos()
 
-            promotion = []
-            for price in promocional["prices"]:
-                if price["type"] == "promotion":
-                    promotion.append(price["amount"])
-                    promotion = str(promotion[0])
+    if not produtos:
+        print("Nenhum produto encontrado na tabela.")
+        return
 
-        detalhes_produto = ConsultaItemDetalhes(produto, access_token)
-        nome_produto = detalhes_produto[0] # Várialvel que pega o nome do produto
-        last_update = detalhes_produto[1] # Várialvel que pega a última atualização do produto
 
-        print(f"{standard} / {promotion} / {nome_produto}")
-        print(last_update)
-
-        insert(1,standard, promotion, last_update)
-        print(f"Aguardando {intervalo} segundos para a próxima coleta...")
+     # Para cada produto encontrado na tabela, consulta os detalhes e preços
+    for produto in produtos:
+        id = produto[0]
+        codprod = produto[1]  # O código do produto está na segunda posição
+        nome_produto = produto[2]  # O nome do produto está na terceira posição
         
-        time.sleep(intervalo)
+        # Coleta as informações do produto
+        detalhes_produto = ConsultaItemDetalhes(codprod, access_token)
+        
+        if detalhes_produto is None:
+            print(f"Erro ao obter detalhes do produto {nome_produto} ({codprod}).")
+            continue  # Pula para o próximo produto
+
+        last_update = detalhes_produto[1]  # Última atualização do produto
+        
+        # Verifica o código do produto e retorna a tupla com o id_produto
+        id_produto = verificaCodigo(codprod, nome_produto)
+        
+        # Coleta os preços promocionais e padrões
+        promocional = ConsultarPrecoPromoc(codprod, access_token)
+        
+        if promocional is None:
+            print(f"Erro ao obter preços do produto {nome_produto} ({codprod}). Tentando novamente...")
+            continue
+
+        # Preços padrão e promocional
+        standard = next((price["amount"] for price in promocional["prices"] if price["type"] == "standard"), "0")
+        promotion = next((price["amount"] for price in promocional["prices"] if price["type"] == "promotion"), "0")
+
+        print(f"Produto: {nome_produto}")
+        print(f"Preço padrão: {standard} / Preço promocional: {promotion}")
+        print(f"Última atualização: {last_update}")
+
+        # Inserir ou atualizar os preços no banco de dados
+        insertpreco(id, standard, promotion, last_update)
 
 main()
