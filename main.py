@@ -72,18 +72,18 @@ def ConsultarPrecoPromoc(produto_id, access_token):
         print(f"Erro ao buscar o produto: {e}")
         return None
     
-# Verifica se o código do produto existe na tabela PRODUTOS 
-def verificaCodigo(codprod, nome):
+# # Verifica se o código do produto existe na tabela PRODUTOS 
+# def verificaCodigo(codprod, nome):
 
-    produto = consultaProdutos()
+#     produto = consultaProdutos()
     
-    if not produto:  # Se não encontrar o produto
-        # Insere o produto na tabela Produtos e retorna o id
-        id_produto = insertproduto(codprod, nome)
-        return id_produto
-    else:
-        print("Produto já existe na tabela")
-        return produto[0]  # Retorna o id do produto encontrado
+#     if not produto:  # Se não encontrar o produto
+#         # Insere o produto na tabela Produtos e retorna o id
+#         id_produto = insertproduto(codprod, nome)
+#         return id_produto
+#     else:
+#         print("Produto já existe na tabela")
+#         return produto[0]  # Retorna o id do produto encontrado
 
 def main():
     response_token = GerarToken()
@@ -126,9 +126,6 @@ def main():
             continue  # Pula para o próximo produto
 
         last_update = detalhes_produto[1]  # Última atualização do produto
-        
-        # Verifica o código do produto e retorna a tupla com o id_produto
-        id_produto = verificaCodigo(codprod, nome_produto)
         
         # Coleta os preços promocionais e padrões
         promocional = ConsultarPrecoPromoc(codprod, access_token)
