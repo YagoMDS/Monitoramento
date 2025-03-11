@@ -41,7 +41,7 @@ def insertproduto(*args):
         cur.close()
         conexao.close()
 
-        return print("Inserção realizada com sucesso!")
+        return print("Inserção realizada com sucesso!\n")
     
     except psycopg2.Error as e:
         print(f"Erro ao inserir dados: {e}")
