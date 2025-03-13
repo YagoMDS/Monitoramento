@@ -1,21 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from database import conectar_db 
+from db_funcoes import dadosparaografico
 
 def criargrafico():
     
     conexao = conectar_db()
 
-    query = "SELECT " \
-        "p.id_produto, " \
-        "prod.codproduto, " \
-        "p.price_default, " \
-        "p.price_promotion, " \
-        "p.last_updated " \
-        "FROM precos p " \
-        "INNER JOIN produtos prod " \
-        "ON p.id_produto = prod.id "\
-        "ORDER BY id_produto, last_updated;"
+    query = dadosparaografico()
     df = pd.read_sql(query, conexao)
 
     conexao.close()
