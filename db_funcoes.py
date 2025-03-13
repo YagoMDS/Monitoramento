@@ -70,3 +70,25 @@ def consultaProdutos():
     except psycopg2.Error as e:
         print(f"Erro ao buscar os dados: {e}")
         return None
+    
+def dadosparaografico():
+
+    query = "SELECT " \
+        "p.id_produto, " \
+        "prod.codproduto, " \
+        "p.price_default, " \
+        "p.price_promotion, " \
+        "p.last_updated " \
+        "FROM precos p " \
+        "INNER JOIN produtos prod " \
+        "ON p.id_produto = prod.id "\
+        "ORDER BY id_produto, last_updated;"
+    
+    return query
+
+
+def buscaultimo():
+    
+    query = "SELECT * FROM precos ORDER BY SEQUENCIAL DESC LIMIT 4;"
+
+    return query 
