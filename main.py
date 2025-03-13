@@ -1,8 +1,9 @@
 import requests
 import time
 import os
-from db_funcoes import insertpreco, consultaProdutos, insertproduto
+from db_funcoes import insertpreco, consultaProdutos, insertproduto, buscaultimo
 from dotenv import load_dotenv 
+import email
 
 # Carregar o arquivo .env
 load_dotenv("infos.env")
@@ -143,6 +144,9 @@ def main():
         print(f"Última atualização: {last_update}")
 
         # Inserir ou atualizar os preços no banco de dados
-        insertpreco(id, standard, promotion, last_update)
+        #insertpreco(id, standard, promotion, last_update)
+
+        ultimo = buscaultimo        
+        print(ultimo)
 
 main()
