@@ -18,6 +18,9 @@ Este projeto foi desenvolvido com o objetivo de monitorar e analisar a variaçã
 - **Matplotlib (para gráficos)**
 - **yagmail (para envio de e-mails)**
 
+## Dados Sigilosos
+As credenciais e outros dados sensíveis, como a chave da API do Mercado Livre e informações de e-mail, estão armazenados em um arquivo `.env` para garantir a segurança e facilitar a configuração. Não compartilhe esse arquivo publicamente.
+
 ## Como Executar
 1. Clone o repositório:
    ```bash
