@@ -24,4 +24,19 @@ As credenciais e outros dados sensíveis, como a chave da API do Mercado Livre e
 ## Como Executar
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu_usuario/seu_repositorio.git
+   git clone https://github.com/YagoMDS/Monitoramento.git
+   
+2. Instale as dependências:
+   ```bash
+   pip install -r requirements.txt
+   
+3. Crie o arquivo .env na raiz do projeto com as seguintes variáveis:
+
+   API_KEY=<Sua_Chave_API_Mercado_Livre>
+   EMAIL=<Seu_E-mail>
+   EMAIL_PASSWORD=<Sua_Senha_De_E-mail>
+   
+4. Configure seu banco de dados PostgreSQL.
+
+5. Execute o script:
+   python main.py
