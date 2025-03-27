@@ -18,7 +18,7 @@ def insertpreco(*args):
         cur.close()
         conexao.close()
 
-        return print("Inserção realizada com sucesso!")
+        return print("Inserção realizada com sucesso!\n")
     
     except psycopg2.Error as e:
         print(f"Erro ao inserir dados: {e}")
@@ -87,8 +87,26 @@ def dadosparaografico():
     return query
 
 
-def buscaultimo():
-    
-    query = "SELECT * FROM precos ORDER BY SEQUENCIAL DESC LIMIT 4;"
+def buscaUltimos(id):
 
-    return query 
+    conexao = conectar_db()
+    if not conexao:
+        return
+
+    try:
+        cur = conexao.cursor()
+
+        query = f"SELECT p.id_produto as ID, prod.name as Nome, p.price_promotion as Promocao, p.last_updated as DataAtualizacao FROM precos as p INNER JOIN produtos as prod ON p.id_produto = prod.id WHERE prod.id = {id} ORDER BY SEQUENCIAL DESC LIMIT 1;"
+        cur.execute(query)
+
+        ultimos = cur.fetchall()
+
+
+        cur.close()
+        conexao.close()
+
+        return ultimos
+    
+    except psycopg2.Error as e:
+        print(f"Erro ao buscar os ultimos dados: {e}")
+        return None
