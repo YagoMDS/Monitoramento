@@ -41,4 +41,5 @@ As credenciais e outros dados sensíveis, como a chave da API do Mercado Livre e
 **4. Configure seu banco de dados PostgreSQL.**
 
 **5. Execute o script:**
+
       python main.py
