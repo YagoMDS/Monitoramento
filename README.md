@@ -24,12 +24,12 @@ As credenciais e outros dados sensíveis, como a chave da API do Mercado Livre e
 ## Como Executar
 **1. Clone o repositório:**
 
-      ```bash
+
       git clone https://github.com/YagoMDS/Monitoramento.git
    
 **2. Instale as dependências:**
 
-      ```bash
+      
       pip install -r requirements.txt
    
 **3. Crie o arquivo .env na raiz do projeto com as seguintes variáveis:**
