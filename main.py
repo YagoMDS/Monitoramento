@@ -1,9 +1,8 @@
 import requests
-import time
 import os
-from db_funcoes import insertpreco, consultaProdutos, insertproduto, buscaultimo
+from db_funcoes import insertpreco, consultaProdutos, insertproduto, buscaUltimos
 from dotenv import load_dotenv 
-import email
+from envia_email import PrecoBaixou
 
 # Carregar o arquivo .env
 load_dotenv("infos.env")
@@ -135,18 +134,31 @@ def main():
             print(f"Erro ao obter preços do produto {nome_produto} ({codprod}). Tentando novamente...")
             continue
 
-        # Preços padrão e promocional
+        # As váriaveis recebem os preços (padrão e promocional)
         standard = next((price["amount"] for price in promocional["prices"] if price["type"] == "standard"), "0")
         promotion = next((price["amount"] for price in promocional["prices"] if price["type"] == "promotion"), "0")
 
+        # Imprime o Produto, Preco e a Ultima atualização de preco do produto
         print(f"Produto: {nome_produto}")
         print(f"Preço padrão: {standard} / Preço promocional: {promotion}")
-        print(f"Última atualização: {last_update}")
+        print(f"Última atualização: {last_update}\n")
 
-        # Inserir ou atualizar os preços no banco de dados
-        #insertpreco(id, standard, promotion, last_update)
+        # Busca o último registro de acordo com o ID passado
+        ultimo = buscaUltimos(id)   
 
-        ultimo = buscaultimo        
-        print(ultimo)
+        # Estrutura de repetição que passa
+        for u in ultimo:
+            ultimo_idprod = u[0]
+            ultimo_precopromo = float(u[2])
+            promotion = float(promotion)
+            if id == ultimo_idprod and float(ultimo_precopromo) != promotion:
+                # Inserir os preços atualizados no banco de dados
+                insertpreco(id, standard, promotion, last_update)
 
+                # Envia e-mail informando que o preço mudou
+                PrecoBaixou(nome_produto)
+                break
+            else:
+                continue
+    
 main()
