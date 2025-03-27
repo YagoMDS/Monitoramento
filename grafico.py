@@ -18,7 +18,7 @@ def criargrafico():
     # Criar gráfico
     plt.figure(figsize=(12, 8))
     for produto, dados_produto in df.groupby('id_produto'):
-        plt.plot(dados_produto['last_updated'], dados_produto['price_default'], marker="o", label=produto)
+        plt.plot(dados_produto['last_updated'], dados_produto['price_promotion'], marker="o", label=produto)
 
     plt.xlabel("Data") # Nomeia o eixo X como "Data"
     plt.ylabel("Preço (R$)") # Nomeia o eixo Y como "Preço (R$)"
