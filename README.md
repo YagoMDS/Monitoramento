@@ -40,6 +40,29 @@ As credenciais e outros dados sensíveis, como a chave da API do Mercado Livre e
    
 **4. Configure seu banco de dados PostgreSQL.**
 
+      CREATE TABLE IF NOT EXISTS public.produtos
+      (
+          id integer NOT NULL DEFAULT nextval('produtos_id_seq'::regclass),
+          codproduto character varying(13) COLLATE pg_catalog."default" NOT NULL,
+          name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+          CONSTRAINT produtos_pkey PRIMARY KEY (id)
+      )
+      
+      CREATE TABLE IF NOT EXISTS public.precos
+      (
+          sequencial integer NOT NULL DEFAULT nextval('produtos_id_seq'::regclass),
+          id_produto integer NOT NULL,
+          price_default numeric(10,2) NOT NULL,
+          price_promotion numeric(10,2) NOT NULL,
+          last_updated date NOT NULL,
+          CONSTRAINT sequencial_pkey PRIMARY KEY (sequencial),
+          CONSTRAINT id_produto FOREIGN KEY (id_produto)
+              REFERENCES public.produtos (id) MATCH SIMPLE
+              ON UPDATE NO ACTION
+              ON DELETE NO ACTION
+      )
+
+      
 **5. Execute o script:**
 
       python main.py
